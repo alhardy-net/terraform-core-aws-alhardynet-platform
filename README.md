@@ -1,0 +1,1 @@
+# terraform-core-aws-alhardynet-platform
