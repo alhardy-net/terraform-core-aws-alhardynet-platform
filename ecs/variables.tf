@@ -13,6 +13,11 @@ variable "aws_assume_role" {
   description = "The AWS Role to assume for the AWS account"
 }
 
+variable "ecs_alb_domain_name" {
+  type        = string
+  description = "The domain name of the API ALB used by the ECS Cluster"
+}
+
 # Terraform Cloud
 variable "TFC_WORKSPACE_SLUG" {
   type        = string
