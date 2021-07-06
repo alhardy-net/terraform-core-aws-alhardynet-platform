@@ -1,4 +1,4 @@
-resource "aws_alb" "ecs_cluster_api_alb" {
+resource "aws_alb" "ecs_cluster_alb" {
   name            = "${local.name}-api-ecs"
   internal        = false
   security_groups = [aws_security_group.ecs_alb_security_group.id]
