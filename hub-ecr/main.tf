@@ -15,11 +15,11 @@ module "ecr" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ecr_full_access" {
-  role       = data.aws_iam_role.ecr_full_access.arn
+  role       = data.aws_iam_role.ecr_full_access.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ecr_readonly_access" {
-  role       = data.aws_iam_role.ecr_readonly_readonly.arn
+  role       = data.aws_iam_role.ecr_readonly_readonly.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
