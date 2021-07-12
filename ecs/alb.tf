@@ -1,11 +1,11 @@
 resource "aws_alb" "ecs_cluster_alb" {
-  name            = "${local.name}-api-ecs"
+  name            = "${local.name}-ecs"
   internal        = false
   security_groups = [aws_security_group.ecs_alb_security_group.id]
   subnets         = data.terraform_remote_state.vpc.outputs.public_subnets
 
   tags = {
-    Name               = "${local.name}-api-ecs"
+    Name               = "${local.name}-ecs"
     TerraformWorkspace = var.TFC_WORKSPACE_SLUG
   }
 }
