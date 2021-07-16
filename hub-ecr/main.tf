@@ -1,5 +1,8 @@
 locals {
-  image_names = ["service-bff", "service-customers"]
+  image_names = [
+    "service-bff-api",
+    "service-customers-api"
+  ]
 }
 
 data "aws_iam_role" "ecr_full_access" {
@@ -18,7 +21,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     principals {
       type = "AWS"
 
-      identifiers = [data.aws_iam_role.ecr_readonly_readonly.arn]
+      identifiers = ["*"]
     }
 
     actions = [
