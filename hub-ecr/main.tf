@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "resource_readonly_access" {
     ]
 
     condition {
-      test     = "StringLike"
+      test     = "ForAnyValue:StringLike"
       values   = ["o-2freyh0vsj/*"]
       variable = "aws:PrincipalOrgPaths"
     }
