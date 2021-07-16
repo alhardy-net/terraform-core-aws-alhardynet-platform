@@ -10,6 +10,7 @@ module "ecr" {
   source                     = "cloudposse/ecr/aws"
   version                    = "0.32.2"
   namespace                  = "alhardynet"
+  image_names                = ["service-bff-api", "service-customers-api"]
   principals_full_access     = [data.aws_iam_role.ecr_full_access.arn]
   principals_readonly_access = [data.aws_iam_role.ecr_readonly_readonly.arn]
 }
