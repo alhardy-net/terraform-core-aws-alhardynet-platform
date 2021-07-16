@@ -34,10 +34,10 @@ data "aws_iam_policy_document" "resource_readonly_access" {
       "ecr:ListImages",
       "ecr:ListTagsForResource",
     ]
-    
+
     condition {
-      test = "StringLike"
-      values = ["o-2freyh0vsj/*"]
+      test     = "StringLike"
+      values   = ["o-2freyh0vsj/*"]
       variable = "aws:PrincipalOrgPaths"
     }
   }
@@ -60,10 +60,10 @@ data "aws_iam_policy_document" "resource_full_access" {
 }
 
 module "ecr" {
-  source                     = "cloudposse/ecr/aws"
-  version                    = "0.32.2"
-  namespace                  = "alhardynet"
-  image_names                = local.image_names
+  source      = "cloudposse/ecr/aws"
+  version     = "0.32.2"
+  namespace   = "alhardynet"
+  image_names = local.image_names
   //principals_full_access     = [data.aws_iam_role.ecr_full_access.arn]
   //principals_readonly_access = [data.aws_iam_role.ecr_readonly_readonly.arn]
 }
@@ -74,8 +74,8 @@ data "aws_iam_policy_document" "resource" {
 }
 
 resource "aws_ecr_repository_policy" "name" {
-  for_each   = toset(local.image_names)
-  repository = each.value
+  count      = length(local.image_names)
+  repository = local.image_names[count.index]
   policy     = join("", data.aws_iam_policy_document.resource.*.json)
 }
 
