@@ -1,5 +1,5 @@
 locals {
-  image_names = ["service-bff-api", "service-customers-api"]
+  image_names = ["servicebff", "servicecustomers"]
 }
 
 data "aws_iam_role" "ecr_full_access" {
