@@ -1,5 +1,5 @@
 locals {
-  image_names = ["servicebff", "servicecustomers"]
+  image_names = ["service-bff", "service-customers"]
 }
 
 data "aws_iam_role" "ecr_full_access" {
@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "resource" {
 
 resource "aws_ecr_repository_policy" "name" {
   for_each   = toset(local.image_names)
-  repository = module.ecr.repository_arn_map[each.value]
+  repository = each.value
   policy     = join("", data.aws_iam_policy_document.resource.*.json)
 }
 
