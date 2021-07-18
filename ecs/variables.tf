@@ -18,6 +18,11 @@ variable "ecs_alb_domain_name" {
   description = "The domain name of the API ALB used by the ECS Cluster"
 }
 
+variable "private_namespace" {
+  type        = string
+  description = "The service discovery private namespace name"
+}
+
 # Terraform Cloud
 variable "TFC_WORKSPACE_SLUG" {
   type        = string
