@@ -40,7 +40,7 @@ variable "xray_image" {
 
 variable "virtual_gateway" {
   type        = object({ service_name = string, cpu = number, memory = number, desired_count = number, max_percent = number, min_percent = number })
-  description = "Configuration for the virtual gateway task"
+  description = "Configuration for the virtual gateway task and service"
 }
 
 # Terraform Cloud
