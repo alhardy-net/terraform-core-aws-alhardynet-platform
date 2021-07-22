@@ -72,6 +72,21 @@ resource "aws_iam_role_policy_attachment" "default_task_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy_attachment" "envoy_task_role" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_task_role" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "xray_task_role" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+
 data "aws_iam_policy_document" "allow_create_log_groups" {
   statement {
     actions   = ["logs:CreateLogGroup"]
