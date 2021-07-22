@@ -13,14 +13,29 @@ variable "aws_assume_role" {
   description = "The AWS Role to assume for the AWS account"
 }
 
-variable "ecs_alb_domain_name" {
+variable "ecs_nlb_domain_name" {
   type        = string
-  description = "The domain name of the API ALB used by the ECS Cluster"
+  description = "The domain name to associate to the NBL used by the ECS Cluster's virtual gateway"
 }
 
 variable "private_namespace" {
   type        = string
   description = "The service discovery private namespace name"
+}
+
+variable "appmesh_name" {
+  type        = string
+  description = "The name of the app mesh"
+}
+
+variable "virtual_gateway_service_name" {
+  type        = string
+  description = "The name of the ecs service running envoy as a virtual gateway"
+}
+
+variable "envoy_image" {
+  type        = string
+  description = "The envoy image to use for the virtual gateway"
 }
 
 # Terraform Cloud

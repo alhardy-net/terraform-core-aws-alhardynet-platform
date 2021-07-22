@@ -1,10 +1,10 @@
 resource "aws_acm_certificate" "ecs_domain_certificate" {
-  domain_name               = var.ecs_alb_domain_name
-  subject_alternative_names = ["*.${var.ecs_alb_domain_name}"]
+  domain_name               = var.ecs_nlb_domain_name
+  subject_alternative_names = ["*.${var.ecs_nlb_domain_name}"]
   validation_method         = "DNS"
 
   tags = {
-    Name = var.ecs_alb_domain_name
+    Name = var.ecs_nlb_domain_name
   }
 
   lifecycle {
@@ -13,7 +13,7 @@ resource "aws_acm_certificate" "ecs_domain_certificate" {
 }
 
 data "aws_route53_zone" "ecs_domain" {
-  name         = "${var.ecs_alb_domain_name}."
+  name         = "${var.ecs_nlb_domain_name}."
   private_zone = false
 }
 

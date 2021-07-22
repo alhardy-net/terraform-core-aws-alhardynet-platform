@@ -1,10 +1,9 @@
 locals {
-  appmesh_name = "alhardynet"
-  virtual_gateway_name = "${local.appmesh_name}-vg"
+  virtual_gateway_name = "${var.appmesh_name}-vg"
 }
 
 resource "aws_appmesh_mesh" "this" {
-  name = local.appmesh_name
+  name = var.appmesh_name
 
   spec {
     egress_filter {
@@ -67,12 +66,12 @@ resource "aws_ecs_task_definition" "envoy" {
   container_definitions = jsonencode([
     {
       name      = "envoy"
-      image     = "840364872350.dkr.ecr.ap-southeast-2.amazonaws.com/aws-appmesh-envoy:v1.18.3.0-prod"
+      image     = var.envoy_image
       essential = true
       environment = [
         {
           name  = "APPMESH_VIRTUAL_NODE_NAME",
-          value = "mesh/${local.appmesh_name}/virtualGateway/${local.virtual_gateway_name}"
+          value = "mesh/${var.appmesh_name}/virtualGateway/${local.virtual_gateway_name}"
         }
       ]
       portMappings = [
@@ -99,20 +98,53 @@ resource "aws_ecs_task_definition" "envoy" {
       }
     }
   ])
-  //  lifecycle {
-  //    ignore_changes = all
-  //  }
+    lifecycle {
+      ignore_changes = all
+    }
+}
+
+resource "aws_security_group" "virtual_gateway" {
+  name        = "${var.virtual_gateway_service_name}-SG"
+  description = "Security group for service to communicate in and out of the virtual gateway"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
+
+  ingress {
+    from_port   = 80
+    protocol    = "TCP"
+    to_port     = 80
+    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.virtual_gateway_service_name}-SG"
+  }
+}
+
+resource "aws_security_group_rule" "virtual_gateway_rules" {
+  type              = "ingress"
+  from_port         = 32768
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+  security_group_id = aws_security_group.virtual_gateway.id
 }
 
 resource "aws_ecs_service" "service" {
-  name            = "envoy"
+  name            = var.virtual_gateway_service_name
   cluster         = aws_ecs_cluster.default.name
   task_definition = aws_ecs_task_definition.envoy.arn
   desired_count   = 1
 
   network_configuration {
     subnets          = data.terraform_remote_state.vpc.outputs.private_application_subnets
-    security_groups  = [aws_security_group.ecs_security_group.id] //TODO: Create dedicated security group see customer-api service
+    security_groups  = [aws_security_group.virtual_gateway.id]
     assign_public_ip = false
   }
 
@@ -137,7 +169,7 @@ resource "aws_ecs_service" "service" {
     weight            = 100
   }
 
-  //  lifecycle {
-  //    ignore_changes = [task_definition]
-  //  }
+    lifecycle {
+      ignore_changes = [task_definition]
+    }
 }

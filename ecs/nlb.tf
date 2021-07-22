@@ -40,14 +40,14 @@ resource "aws_alb_listener" "ecs_nlb_https_listener" {
   depends_on = [aws_alb_target_group.ecs_nlb_default_group]
 }
 
-//resource "aws_route53_record" "ecs_nlb_record" {
-//  name    = "*.${var.ecs_alb_domain_name}"
-//  type    = "A"
-//  zone_id = data.aws_route53_zone.ecs_domain.zone_id
-//
-//  alias {
-//    evaluate_target_health = false
-//    name                   = aws_alb.ecs_cluster_alb.dns_name
-//    zone_id                = aws_alb.ecs_cluster_alb.zone_id
-//  }
-//}
+resource "aws_route53_record" "ecs_nlb_record" {
+  name    = var.ecs_nlb_domain_name
+  type    = "A"
+  zone_id = data.aws_route53_zone.ecs_domain.zone_id
+
+  alias {
+    evaluate_target_health = false
+    name                   = aws_alb.ecs_cluster_nlb.dns_name
+    zone_id                = aws_alb.ecs_cluster_nlb.zone_id
+  }
+}
