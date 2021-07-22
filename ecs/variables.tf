@@ -38,6 +38,11 @@ variable "envoy_image" {
   description = "The envoy image to use for the virtual gateway"
 }
 
+variable "xray_image" {
+  type        = string
+  description = "The xray image to use for tracing on virtual gateway"
+}
+
 # Terraform Cloud
 variable "TFC_WORKSPACE_SLUG" {
   type        = string

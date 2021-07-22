@@ -53,7 +53,11 @@ resource "aws_appmesh_virtual_gateway" "this" {
   }
 }
 
-resource "aws_ecs_task_definition" "envoy" {
+data "aws_ecs_task_definition" "virtual_gateway" {
+  task_definition = aws_ecs_task_definition.virtual_gateway.family
+}
+
+resource "aws_ecs_task_definition" "virtual_gateway" {
   family = "virtual-gateway"
   requires_compatibilities = [
     "FARGATE",
@@ -61,9 +65,20 @@ resource "aws_ecs_task_definition" "envoy" {
   execution_role_arn = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
   task_role_arn      = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
   network_mode       = "awsvpc"
-  cpu                = 256
-  memory             = 512
+  cpu                = 512
+  memory             = 1024
   container_definitions = jsonencode([
+    {
+      name  = "xray-daemon"
+      image = var.xray_image
+      portMappings = [
+        {
+          containerPort = 2000
+          hostPort      = 2000
+          protocol      = "udp"
+        }
+      ]
+    },
     {
       name      = "envoy"
       image     = var.envoy_image
@@ -72,6 +87,10 @@ resource "aws_ecs_task_definition" "envoy" {
         {
           name  = "APPMESH_VIRTUAL_NODE_NAME",
           value = "mesh/${var.appmesh_name}/virtualGateway/${local.virtual_gateway_name}"
+        },
+        {
+          name  = "ENABLE_ENVOY_XRAY_TRACING",
+          value = "1"
         }
       ]
       portMappings = [
@@ -98,9 +117,6 @@ resource "aws_ecs_task_definition" "envoy" {
       }
     }
   ])
-    lifecycle {
-      ignore_changes = all
-    }
 }
 
 resource "aws_security_group" "virtual_gateway" {
@@ -108,26 +124,12 @@ resource "aws_security_group" "virtual_gateway" {
   description = "Security group for service to communicate in and out of the virtual gateway"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
-  ingress {
-    from_port   = 80
-    protocol    = "TCP"
-    to_port     = 80
-    cidr_blocks = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.virtual_gateway_service_name}-SG"
   }
 }
 
-resource "aws_security_group_rule" "virtual_gateway_rules" {
+resource "aws_security_group_rule" "ephemeral_ports_ingress" {
   type              = "ingress"
   from_port         = 32768
   to_port           = 65535
@@ -136,10 +138,28 @@ resource "aws_security_group_rule" "virtual_gateway_rules" {
   security_group_id = aws_security_group.virtual_gateway.id
 }
 
+resource "aws_security_group_rule" "virtual_gateway_ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "TCP"
+  cidr_blocks       = [data.terraform_remote_state.vpc.outputs.vpc_cidr_block]
+  security_group_id = aws_security_group.virtual_gateway.id
+}
+
+resource "aws_security_group_rule" "egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.virtual_gateway.id
+}
+
 resource "aws_ecs_service" "service" {
   name            = var.virtual_gateway_service_name
   cluster         = aws_ecs_cluster.default.name
-  task_definition = aws_ecs_task_definition.envoy.arn
+  task_definition = "${aws_ecs_task_definition.virtual_gateway.family}:${max(aws_ecs_task_definition.virtual_gateway.revision, data.aws_ecs_task_definition.virtual_gateway.revision)}"
   desired_count   = 1
 
   network_configuration {
@@ -168,8 +188,4 @@ resource "aws_ecs_service" "service" {
     capacity_provider = "FARGATE"
     weight            = 100
   }
-
-    lifecycle {
-      ignore_changes = [task_definition]
-    }
 }
