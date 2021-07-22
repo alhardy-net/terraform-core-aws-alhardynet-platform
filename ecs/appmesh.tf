@@ -65,8 +65,8 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
   execution_role_arn = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
   task_role_arn      = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
   network_mode       = "awsvpc"
-  cpu                = 512
-  memory             = 1024
+  cpu                = 256
+  memory             = 512
   container_definitions = jsonencode([
     {
       name  = "xray-daemon"
@@ -120,12 +120,12 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
 }
 
 resource "aws_security_group" "virtual_gateway" {
-  name        = "${var.virtual_gateway_service_name}-SG"
+  name        = "${var.virtual_gateway.service_name}-SG"
   description = "Security group for service to communicate in and out of the virtual gateway"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
   tags = {
-    Name = "${var.virtual_gateway_service_name}-SG"
+    Name = "${var.virtual_gateway.service_name}-SG"
   }
 }
 
@@ -157,10 +157,12 @@ resource "aws_security_group_rule" "egress" {
 }
 
 resource "aws_ecs_service" "service" {
-  name            = var.virtual_gateway_service_name
-  cluster         = aws_ecs_cluster.default.name
-  task_definition = "${aws_ecs_task_definition.virtual_gateway.family}:${max(aws_ecs_task_definition.virtual_gateway.revision, data.aws_ecs_task_definition.virtual_gateway.revision)}"
-  desired_count   = 1
+  name                               = var.virtual_gateway.service_name
+  cluster                            = aws_ecs_cluster.default.name
+  task_definition                    = "${aws_ecs_task_definition.virtual_gateway.family}:${max(aws_ecs_task_definition.virtual_gateway.revision, data.aws_ecs_task_definition.virtual_gateway.revision)}"
+  desired_count                      = var.virtual_gateway.desired_count
+  deployment_maximum_percent         = var.virtual_gateway.max_percent
+  deployment_minimum_healthy_percent = var.virtual_gateway.min_percent
 
   network_configuration {
     subnets          = data.terraform_remote_state.vpc.outputs.private_application_subnets

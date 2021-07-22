@@ -28,11 +28,6 @@ variable "appmesh_name" {
   description = "The name of the app mesh"
 }
 
-variable "virtual_gateway_service_name" {
-  type        = string
-  description = "The name of the ecs service running envoy as a virtual gateway"
-}
-
 variable "envoy_image" {
   type        = string
   description = "The envoy image to use for the virtual gateway"
@@ -41,6 +36,11 @@ variable "envoy_image" {
 variable "xray_image" {
   type        = string
   description = "The xray image to use for tracing on virtual gateway"
+}
+
+variable "virtual_gateway" {
+  type        = object({ service_name = string, cpu = number, memory = number, desired_count = number, max_percent = number, min_percent = number })
+  description = "Configuration for the virtual gateway task"
 }
 
 # Terraform Cloud
