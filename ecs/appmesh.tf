@@ -77,7 +77,16 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
           hostPort      = 2000
           protocol      = "udp"
         }
-      ]
+      ],
+      logConfiguration = {
+        logDriver = "awslogs",
+        secretOptions = null
+        options = {
+          awslogs-group = "/ecs/virtual-gateway"
+          awslogs-region = "ap-southeast-2",
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     },
     {
       name      = "envoy"
@@ -91,6 +100,10 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
         {
           name  = "ENABLE_ENVOY_XRAY_TRACING",
           value = "1"
+        },
+        {
+          name: "ENVOY_LOG_LEVEL",
+          value: "info"
         }
       ]
       portMappings = [
@@ -114,6 +127,15 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
           "CMD-SHELL",
           "curl -s http://localhost:9901/server_info | grep state | grep -q LIVE"
         ]
+      },
+      logConfiguration = {
+        logDriver = "awslogs",
+        secretOptions = null
+        options = {
+          awslogs-group = "/ecs/virtual-gateway"
+          awslogs-region = "ap-southeast-2",
+          awslogs-stream-prefix = "ecs"
+        }
       }
     }
   ])
