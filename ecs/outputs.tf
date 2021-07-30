@@ -22,6 +22,11 @@ output "namespace_hostname" {
   description = "The hostname of the private dns namespace"
 }
 
+output "cluster_name" {
+  value = aws_ecs_cluster.default.name
+  description = "The name of the ecs cluster"
+}
+
 output "appmesh_name" {
   value       = aws_appmesh_mesh.this.name
   description = "The name of the App Mesh used for the ECS Cluster"
