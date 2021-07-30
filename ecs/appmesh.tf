@@ -2,6 +2,16 @@ locals {
   virtual_gateway_name = "${var.appmesh_name}-vg"
 }
 
+resource "aws_cloudwatch_log_group" "this" {
+  name              = "/ecs/${var.virtual_gateway.service_name}"
+  retention_in_days = 90
+}
+
+resource "aws_cloudwatch_log_stream" "this" {
+  name           = "${var.virtual_gateway.service_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.this.name
+}
+
 resource "aws_appmesh_mesh" "this" {
   name = var.appmesh_name
 
@@ -82,7 +92,7 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
         logDriver = "awslogs",
         secretOptions = null
         options = {
-          awslogs-group = "/ecs/virtual-gateway"
+          awslogs-group = "/ecs/${var.virtual_gateway.service_name}"
           awslogs-region = "ap-southeast-2",
           awslogs-stream-prefix = "ecs"
         }
@@ -132,7 +142,7 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
         logDriver = "awslogs",
         secretOptions = null
         options = {
-          awslogs-group = "/ecs/virtual-gateway"
+          awslogs-group = "/ecs/${var.virtual_gateway.service_name}"
           awslogs-region = "ap-southeast-2",
           awslogs-stream-prefix = "ecs"
         }
