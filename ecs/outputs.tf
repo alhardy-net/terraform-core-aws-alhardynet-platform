@@ -23,7 +23,7 @@ output "namespace_hostname" {
 }
 
 output "cluster_name" {
-  value = aws_ecs_cluster.default.name
+  value       = aws_ecs_cluster.default.name
   description = "The name of the ecs cluster"
 }
 

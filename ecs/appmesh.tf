@@ -89,11 +89,11 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
         }
       ],
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver     = "awslogs",
         secretOptions = null
         options = {
-          awslogs-group = "/ecs/${var.virtual_gateway.service_name}"
-          awslogs-region = "ap-southeast-2",
+          awslogs-group         = "/ecs/${var.virtual_gateway.service_name}"
+          awslogs-region        = "ap-southeast-2",
           awslogs-stream-prefix = "ecs"
         }
       }
@@ -112,8 +112,8 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
           value = "1"
         },
         {
-          name: "ENVOY_LOG_LEVEL",
-          value: "info"
+          name : "ENVOY_LOG_LEVEL",
+          value : "info"
         }
       ]
       portMappings = [
@@ -139,11 +139,11 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
         ]
       },
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver     = "awslogs",
         secretOptions = null
         options = {
-          awslogs-group = "/ecs/${var.virtual_gateway.service_name}"
-          awslogs-region = "ap-southeast-2",
+          awslogs-group         = "/ecs/${var.virtual_gateway.service_name}"
+          awslogs-region        = "ap-southeast-2",
           awslogs-stream-prefix = "ecs"
         }
       }
