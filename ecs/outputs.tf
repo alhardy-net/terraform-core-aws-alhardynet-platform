@@ -12,6 +12,11 @@ output "ecs_cluster_nlb_https_listener_arn" {
   value = aws_alb_listener.ecs_nlb_https_listener.arn
 }
 
+output "ecs_cluster_nlb_default_group_arn" {
+  value       = aws_alb_target_group.ecs_nlb_default_group.arn
+  description = "The NBL's default group arn"
+}
+
 output "namespace_id" {
   value       = aws_service_discovery_private_dns_namespace.default.id
   description = "The namespace id of the private dns namespace"
@@ -35,11 +40,6 @@ output "appmesh_name" {
 output "appmesh_arn" {
   value       = aws_appmesh_mesh.this.arn
   description = "The arn of the App Mesh used for the ECS Cluster"
-}
-
-output "appmesh_virtual_gateway_name" {
-  value       = aws_appmesh_virtual_gateway.this.name
-  description = "The name of the App Mesh Virtual Gateway"
 }
 
 output "service_discovery_private_dns_namespace_name" {

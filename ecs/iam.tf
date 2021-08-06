@@ -61,15 +61,7 @@ data "aws_iam_policy_document" "ecs_task_assume_role_policy" {
 
 resource "aws_iam_role" "ecs_task_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role_policy.json
-  name               = "EcsCluster${local.name}DefaultTaskRole"
-  tags = {
-    TerraformWorkspace = var.TFC_WORKSPACE_SLUG
-  }
-}
-
-resource "aws_iam_role" "ecs_task_role" {
-  assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role_policy.json
-  name               = "EcsCluster${var.virtual_gateway.service_name}DefaultTaskRole"
+  name               = "EcsCluster${local.name}DefaultTaskExecutionRole"
   tags = {
     TerraformWorkspace = var.TFC_WORKSPACE_SLUG
   }
@@ -83,16 +75,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_service_role"
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_cloud_watch_access" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_task_role_appmesh_access" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_task_role_xray_access" {
-  role       = aws_iam_role.ecs_task_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 data "aws_iam_policy_document" "allow_create_log_groups" {
