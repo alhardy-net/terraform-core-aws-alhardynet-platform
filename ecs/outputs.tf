@@ -51,3 +51,8 @@ output "service_discovery_private_dns_namespace_arn" {
   value       = aws_service_discovery_private_dns_namespace.default.arn
   description = "The arn of private dns namespace name for service discovery"
 }
+
+output "default_task_execution_role_arn" {
+  value       = aws_iam_role.ecs_task_execution_role.arn
+  description = "The arn of the default task execution role"
+}

@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "ecs_task_role_policy" {
   }
 }
 
-resource "aws_iam_role" "ecs_task_role" {
+resource "aws_iam_role" "ecs_task_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.ecs_task_role_policy.json
   name               = "EcsCluster${local.name}DefaultTaskRole"
   tags = {
@@ -67,23 +67,23 @@ resource "aws_iam_role" "ecs_task_role" {
   }
 }
 
-resource "aws_iam_role_policy_attachment" "default_task_role" {
-  role       = aws_iam_role.ecs_task_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_service_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy_attachment" "envoy_task_role" {
-  role       = aws_iam_role.ecs_task_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_envoy_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSAppMeshEnvoyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_task_role" {
-  role       = aws_iam_role.ecs_task_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_cloud_watch_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "xray_task_role" {
-  role       = aws_iam_role.ecs_task_role.name
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_xray_write_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
@@ -94,9 +94,9 @@ data "aws_iam_policy_document" "allow_create_log_groups" {
   }
 }
 
-resource "aws_iam_role_policy" "allow_create_log_groups" {
+resource "aws_iam_role_policy" "ecs_task_execution_role_allow_create_log_groups" {
   policy = data.aws_iam_policy_document.allow_create_log_groups.json
-  role   = aws_iam_role.ecs_task_role.id
+  role   = aws_iam_role.ecs_task_execution_role.id
 }
 
 // Allows AWS autoscaling to inspect the stats and adjust scalable targets
