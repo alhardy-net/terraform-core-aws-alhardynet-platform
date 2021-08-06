@@ -72,8 +72,8 @@ resource "aws_ecs_task_definition" "virtual_gateway" {
   requires_compatibilities = [
     "FARGATE",
   ]
-  execution_role_arn = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
-  task_role_arn      = "arn:aws:iam::${var.aws_account_id}:role/EcsClusteralhardynetDefaultTaskRole"
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
   network_mode       = "awsvpc"
   cpu                = 256
   memory             = 512
