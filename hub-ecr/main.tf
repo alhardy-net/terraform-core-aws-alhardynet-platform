@@ -1,7 +1,8 @@
 locals {
   image_names = [
     "service-bff-api",
-    "service-customers-api"
+    "service-customers-api",
+    "service-customers-worker"
   ]
 }
 
