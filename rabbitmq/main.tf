@@ -41,7 +41,7 @@ resource "aws_mq_broker" "this" {
   deployment_mode            = "CLUSTER_MULTI_AZ"
   auto_minor_version_upgrade = true
   engine_type                = "RabbitMQ"
-  engine_version             = "3.8.17"
+  engine_version             = "3.8.11"
   host_instance_type         = "mq.m5.large"
   subnet_ids                 = data.terraform_remote_state.vpc.outputs.private_persistence_subnets
   security_groups            = [aws_security_group.this.id]
