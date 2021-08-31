@@ -59,12 +59,25 @@ data "aws_iam_policy_document" "ecs_task_assume_role_policy" {
   }
 }
 
+data "aws_iam_policy_document" "aws_distro_open_telemetry" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameters"]
+    resources = ["*"] # TODO: Restrict to what's necessary
+  }
+}
+
 resource "aws_iam_role" "ecs_task_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume_role_policy.json
   name               = "EcsCluster${local.name}DefaultTaskExecutionRole"
   tags = {
     TerraformWorkspace = var.TFC_WORKSPACE_SLUG
   }
+}
+
+resource "aws_iam_role_policy" "ecs_task_execution_role_aws_distro_open_telementry" {
+  policy = data.aws_iam_policy_document.aws_distro_open_telemetry.json
+  role   = aws_iam_role.ecs_task_execution_role.id
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_service_role" {
